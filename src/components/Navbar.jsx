@@ -1,6 +1,13 @@
-export default function Navbar() {
+import { useContext, useState } from "react";
+import { useThree } from "@react-three/fiber";
+import ZoomControls from "./ZoomControls";
+
+export default function Navbar({handleReset, zoomIn, zoomOut }) {
+
+
+
     return(
-        <div className="w-full mt-2 z-50 ">
+        <div className=" w-full mt-2 z-50 ">
             <div className=" w-2/3 mx-auto  bg-gray-300 bg-opacity-25 rounded-xl p-1 border-2 border-gray-600">
                 <div className="w-full flex items-center justify-around">
                     <button type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
@@ -9,13 +16,13 @@ export default function Navbar() {
                     </svg>
                     </button>
 
-                    <button type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
+                    <button onClick={() => zoomIn.current()} type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
                         </svg>
                     </button>
 
-                    <button type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
+                    <button onClick={() => zoomOut.current()} type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM13.5 10.5h-6" />
                         </svg>
@@ -39,7 +46,10 @@ export default function Navbar() {
                         </svg>
                     </button>
 
-                    <button type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
+                    <button 
+                        onClick={handleReset} 
+                        type="button" 
+                        className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>

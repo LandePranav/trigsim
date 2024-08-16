@@ -1,10 +1,11 @@
-import {Canvas} from "@react-three/fiber" ;
+import {Canvas, useThree} from "@react-three/fiber" ;
 import {Html} from "@react-three/drei" ;
 import Backcity from "../assets/Backcity" ;
 import Cameraman from "../assets/Cameraman" ;
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Navbar from "./Navbar";
 import Target from "../assets/Target" ;
+import ZoomControls from "./ZoomControls";
 
 export default function DraggableResizableShape() {
     const [CameramanPosition, setCamermanPosition] = useState({x:50, y:-100}) ;
@@ -13,6 +14,16 @@ export default function DraggableResizableShape() {
 
     const [targetPosition, setTargetPosition] = useState({x:window.innerWidth - 200, y:-300});
     const [isDraggingTarget, setIsDraggingTarget] = useState(false) ;
+    const [distanceBetween, setDistanceBetween] = useState(null) ;
+    const [heightDiff, setHeightDiff] = useState(null) ;
+
+    const zoomInRef = useRef(null);
+    const zoomOutRef = useRef(null);
+
+    useEffect(() => {
+        setDistanceBetween(Math.round(targetPosition.x - CameramanPosition.x)) ;
+        setHeightDiff(Math.round(targetPosition.y + 500)) ;
+    }, [CameramanPosition, targetPosition]) ;
 
     // const handlePointerDownDrag = (e) => {
     //     setIsDragging(true) ;
@@ -23,6 +34,10 @@ export default function DraggableResizableShape() {
     //     setIsResizing(true) ;
     //     e.stopPropagation();
     // }
+    const handleReset = () => {
+        setCamermanPosition({x:50, y:-100});
+        setTargetPosition({x:window.innerWidth - 200, y:-300});
+    }
 
     const handlePointerMove = (e) => {
         if(isDraggingCameraman){
@@ -49,10 +64,13 @@ export default function DraggableResizableShape() {
 
     return(
         <div className="w-screen h-screen">
-            <Canvas className="w-screen h-screen" onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-                <Html fullscreen>
-                    <Navbar />
+            
 
+            <Canvas className="w-screen h-screen " onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
+
+                <ZoomControls zoomInRef={zoomInRef} zoomOutRef={zoomOutRef} />
+                <Html fullscreen>
+                <Navbar handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
                     <div className="absolute inset-0 w-full h-full -z-10">
                         <Backcity className="object-cover w-full h-full opacity-65"/>
                     </div>
@@ -62,8 +80,8 @@ export default function DraggableResizableShape() {
                         style={{
                                     left: `${CameramanPosition.x}px`,
                                     bottom: `${CameramanPosition.y}px`,
-                                    height: "300px",
-                                    width : "100px",
+                                    height: "200px",
+                                    width : "150px",
                                     zIndex: 10,
                                 }}
                         onPointerDown={() => setIsDraggingCameraman(true)}       
@@ -84,6 +102,11 @@ export default function DraggableResizableShape() {
                         onPointerDown={handlePointerDownResize}
                     /> */}
 
+                    <div>
+                        Dist :- {distanceBetween}---
+                        Height :- {heightDiff}
+                    </div>
+
                     <div 
                         className="absolute cursor-move"
                         style={{
@@ -99,7 +122,7 @@ export default function DraggableResizableShape() {
                     </div>
 
                 </Html>
-            </Canvas>
+                </Canvas>
         </div>
     );
 }
