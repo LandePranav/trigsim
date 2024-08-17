@@ -8,12 +8,17 @@ import Target from "../assets/Target";
 import ZoomControls from "./ZoomControls";
 import * as THREE from 'three';
 import VirtualCamera from "./VirtualCamera";
+import CameraSvg from "../assets/CameraSvg";
+import Visible from "../assets/Visible";
+import NotVisible from "../assets/NotVisible" ;
 
 const DraggableResizableShape = () => {
   const [cameramanPosition, setCameramanPosition] = useState({ x: 50, y: -100 });
   const [isDraggingCameraman, setIsDraggingCameraman] = useState(false);
   const [targetPosition, setTargetPosition] = useState({ x: window.innerWidth - 200, y: -300 });
   const [isDraggingTarget, setIsDraggingTarget] = useState(false);
+  const [isDraggingAngle, setIsDraggingAngle] = useState(false);
+  const [angle, setAngle] = useState(90);
   const [distanceBetween, setDistanceBetween] = useState(null);
   const [heightDiff, setHeightDiff] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -22,6 +27,13 @@ const DraggableResizableShape = () => {
   const zoomInRef = useRef(null);
   const zoomOutRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [reqAngle, setReqAngle] = useState(10);
+
+  useEffect(()=> {
+    const angleInRad = Math.atan2(heightDiff/distanceBetween) ;
+    const angleInDeg = angleInRad*(180/Math.PI) ;
+    setReqAngle(angleInDeg) ;
+  }, [angle, distanceBetween, heightDiff]) ;
 
   useEffect(() => {
     setDistanceBetween(Math.round(targetPosition.x - cameramanPosition.x));
@@ -29,28 +41,45 @@ const DraggableResizableShape = () => {
   }, [cameramanPosition, targetPosition]);
 
   const lineStart = {
-    x: cameramanPosition.x + 150 + 10, // Adjust based on the width of the cameraman building (half of 150px width)
-    y: window.innerHeight - 100, // Adjust based on the height of the building (200px height)
+    x: cameramanPosition.x + 150 + 10,
+    y: window.innerHeight - 100,
   };
 
   const lineEnd = {
-    x: targetPosition.x + 20 , // Adjust based on the width of the target building (half of 200px width)
-    y: window.innerHeight - 100, // Adjust based on the height of the building (400px height)
+    x: targetPosition.x + 20,
+    y: window.innerHeight - 100,
   };
+
   const vlineStart = {
-    x: targetPosition.x + 20, // Adjust based on the width of the cameraman building (half of 150px width)
-    y: window.innerHeight - 120, // Adjust based on the height of the building (200px height)
+    x: targetPosition.x + 20,
+    y: window.innerHeight - 120,
   };
 
   const vlineEnd = {
-    x: targetPosition.x + 20 , // Adjust based on the width of the target building (half of 200px width)
-    y: window.innerHeight - targetPosition.y - 420 , // Adjust based on the height of the building (400px height)
+    x: targetPosition.x + 20,
+    y: window.innerHeight - targetPosition.y - 420,
+  };
+
+  const cameraPosition = {
+    x: cameramanPosition.x + 10,
+    y: window.innerHeight - 150,
+  };
+
+  const alineLength = 200;
+  const radians = (angle * Math.PI) / 180;
+  const alineEnd = {
+    x: cameraPosition.x + alineLength * Math.cos(radians),
+    y: cameraPosition.y - alineLength * Math.sin(radians),
   };
 
   const handleReset = () => {
     setCameramanPosition({ x: 50, y: -100 });
     setTargetPosition({ x: window.innerWidth - 200, y: -300 });
   };
+
+  // const hangleClickImage = () => {
+
+  // }
 
   const handlePointerMove = useCallback((e) => {
     if (isDraggingCameraman) {
@@ -68,8 +97,15 @@ const DraggableResizableShape = () => {
         currentLineRef.current.geometry.vertices.push(new THREE.Vector3(x, y, 0));
         currentLineRef.current.geometry.verticesNeedUpdate = true;
       }
+    } else if (isDraggingAngle) {
+      const dx = e.clientX - cameraPosition.x;
+      const dy = cameraPosition.y - e.clientY;
+      const newAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      if (newAngle >= 0 && newAngle <= 180) {
+        setAngle(newAngle);
+      }
     }
-  }, [isDraggingCameraman, isDraggingTarget, isDrawing]);
+  }, [isDraggingCameraman, isDraggingTarget, isDrawing, isDraggingAngle]);
 
   const handlePointerDown = (e) => {
     if (isDrawing && e.point) {
@@ -87,6 +123,7 @@ const DraggableResizableShape = () => {
     setIsDraggingCameraman(false);
     setIsDraggingTarget(false);
     currentLineRef.current = null;
+    setIsDraggingAngle(false);
   };
 
   return (
@@ -104,104 +141,57 @@ const DraggableResizableShape = () => {
         <pointLight position={[10, 10, 10]} />
         <Html fullscreen>
           <Navbar isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+          <CameraSvg className="w-44 absolute left-96 top-12" />
+          <div className="absolute w-full h-full top-36 left-96">
+            <div className="absolute w-36 h-16 -left-4 overflow-hidden">
+ 
+            {(reqAngle < angle || reqAngle == angle) ? 
+              <Visible
+                className="absolute w-full h-20 object-cover"   
+              /> 
+              : 
+              <NotVisible
+                className="absolute w-full h-40 -top-8  object-cover"
+              />
+            }  
+                           
+            </div>
+            
+          </div>
           <div className="absolute inset-0 w-full h-full -z-10">
             <Backcity className="object-cover w-full h-full opacity-65" />
           </div>
 
-          <div className="absolute"
-            style={{
-                left: `${(lineEnd.x + lineStart.x)/2 -10}px`,
-                bottom: "50px" 
-            }}
-          >
-                <h2 className=" bg-gray-700 text-white px-2 rounded-md " >
-                {distanceBetween}
-            </h2>
-          </div> 
-          
-          <div className="absolute"
-            style={{
-                left: `${vlineEnd.x -50}px`,
-                top: `${(vlineEnd.y + vlineStart.y)/2 + 50}px`
-            }}
-          >
-                <h2 className="bg-gray-700 text-white px-2 rounded-md " >
-                {heightDiff}
-            </h2>
-          </div> 
+          <div className="absolute z-30" style={{ left: `${(lineEnd.x + lineStart.x) / 2 - 10}px`, bottom: "50px" }}>
+            <h2 className="bg-gray-700 text-white px-2 rounded-md">{distanceBetween}</h2>
+          </div>
+
+          <div className="absolute z-30" style={{ left: `${vlineEnd.x - 50}px`, top: `${(vlineEnd.y + vlineStart.y) / 2 + 50}px` }}>
+            <h2 className="bg-gray-700 text-white px-2 rounded-md">{heightDiff}</h2>
+          </div>
 
           <svg className="absolute w-full h-full pointer-events-none opacity-50">
-          <defs>
-              <marker
-                id="arrow-start"
-                markerWidth="10"
-                markerHeight="10"
-                refX="5"
-                refY="5"
-                orient="auto-start-reverse"
-                markerUnits="strokeWidth"
-              >
+            <defs>
+              <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 Z" fill="red" />
               </marker>
-              <marker
-                id="arrow-end"
-                markerWidth="10"
-                markerHeight="10"
-                refX="5"
-                refY="5"
-                orient="auto"
-                markerUnits="strokeWidth"
-              >
+              <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 Z" fill="red" />
               </marker>
             </defs>
-            <line
-              x1={lineStart.x}
-              y1={lineStart.y}
-              x2={lineEnd.x}
-              y2={lineEnd.y}
-              stroke="red"
-              strokeWidth="2"
-              markerStart="url(#arrow-start)"
-              markerEnd="url(#arrow-end)"
-            />
+            <line x1={lineStart.x} y1={lineStart.y} x2={lineEnd.x} y2={lineEnd.y} stroke="red" strokeWidth="2" markerStart="url(#arrow-start)" markerEnd="url(#arrow-end)" />
           </svg>
 
           <svg className="absolute w-full h-full pointer-events-none opacity-50">
-          <defs>
-              <marker
-                id="arrow-start"
-                markerWidth="10"
-                markerHeight="10"
-                refX="5"
-                refY="5"
-                orient="auto-start-reverse"
-                markerUnits="strokeWidth"
-              >
+            <defs>
+              <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 Z" fill="red" />
               </marker>
-              <marker
-                id="arrow-end"
-                markerWidth="10"
-                markerHeight="10"
-                refX="5"
-                refY="5"
-                orient="auto"
-                markerUnits="strokeWidth"
-              >
+              <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto" markerUnits="strokeWidth">
                 <path d="M0,0 L10,5 L0,10 Z" fill="red" />
               </marker>
             </defs>
-            <line
-              x1={vlineStart.x}
-              y1={vlineStart.y}
-              x2={vlineEnd.x}
-              y2={vlineEnd.y}
-              stroke="red"
-              strokeWidth="2"
-              markerStart="url(#arrow-start)"
-              markerEnd="url(#arrow-end)"
-            />
+            <line x1={vlineStart.x} y1={vlineStart.y} x2={vlineEnd.x} y2={vlineEnd.y} stroke="red" strokeWidth="2" markerStart="url(#arrow-start)" markerEnd="url(#arrow-end)" />
           </svg>
 
           <div
@@ -217,9 +207,11 @@ const DraggableResizableShape = () => {
           >
             <Cameraman className="w-full h-full z-10" />
           </div>
-          <div>
-            Dist: {distanceBetween} --- Height: {heightDiff}
-          </div>
+
+          <button type="button" className="absolute bg-gray-800 text-white font-mono rounded-md p-1 " style={{bottom:"120px",left:`${cameraPosition.x -70}px`}} >
+            Click Picture
+          </button>
+
           <div
             className="absolute cursor-move"
             style={{
@@ -233,16 +225,12 @@ const DraggableResizableShape = () => {
           >
             <Target className="w-full h-full z-10" />
           </div>
-                  <VirtualCamera cameramanPosition={cameramanPosition} />
-
+          <VirtualCamera cameramanPosition={cameramanPosition} />
         </Html>
-        
 
         {linesRef.current.map((line, index) => (
           <primitive key={index} object={line} />
         ))}
-
-
       </Canvas>
     </div>
   );

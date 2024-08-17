@@ -6,12 +6,12 @@ const VirtualCamera = ({ cameramanPosition }) => {
 
   // Calculate the camera's central position directly from the cameraman's position
   const cameraPosition = {
-    x: cameramanPosition.x + 210, // Your original x offset
-    y: window.innerHeight + cameramanPosition.y - 50, // Your original y offset
+    x: cameramanPosition.x + 205, // Your original x offset
+    y: window.innerHeight  - 130, // Your original y offset
   };
 
   // Calculate the endpoint of the line based on the angle
-  const lineLength = 200; // Length of the draggable line
+  const lineLength = 175; // Length of the draggable line
   const radians = (angle * Math.PI) / 180;
   const lineEnd = {
     x: cameraPosition.x + lineLength * Math.cos(radians),
@@ -58,7 +58,7 @@ const VirtualCamera = ({ cameramanPosition }) => {
   return (
     <>
       {/* SVG Visualization */}
-      <svg className="absolute w-full h-full pointer-events-none">
+      <svg className="absolute w-full h-full pointer-events-none opacity-50">
         {/* Base Horizontal Line */}
         <line
           x1={cameraPosition.x - 150}
