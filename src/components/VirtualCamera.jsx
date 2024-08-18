@@ -7,7 +7,7 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
   // Calculate the camera's central position based on the Cameraman's position
   const cameraPosition = {
     x: cameramanPosition.x + 200, // Your original x offset
-    y: window.innerHeight - 230, // Your original y offset
+    y: window.innerHeight - 215, // Your original y offset
   };
 
   // Calculate the endpoint of the line based on the angle
@@ -67,6 +67,17 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
     };
   }, [dragging]);
 
+  // Calculate control points for the curve
+  const baseMidpoint = {
+    x: (cameraPosition.x  + lineEnd.x)/2 - 35 ,
+    y : (cameraPosition.y + lineEnd.y)/2 + 25 ,
+  }
+
+  // SVG Path for the curve using Bézier curve syntax
+  const curvePath = `M${cameraPosition.x -25 },${cameraPosition.y} 
+                     Q${baseMidpoint.x},${baseMidpoint.y} 
+                      ${(lineEnd.x + cameraPosition.x)/2 -75},${(lineEnd.y + cameraPosition.y)/2}`;
+
   return (
     <>
       {/*
@@ -76,7 +87,7 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
       */}
 
       {/* SVG Visualization */}
-      <svg className="absolute w-full h-full opacity-50 ">
+        <svg className="w-full h-full opacity-50 z-10">
         <defs>
           <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L10,5 L0,10 Z" fill="black" />
@@ -105,9 +116,17 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
           onMouseDown={handleMouseDown} // Start dragging on mouse down
         />
 
+         {/* Curve Path */}
+         <path
+          d={curvePath}
+          stroke="white"
+          strokeWidth="2"
+          fill="none"
+        />
+        
         {/* Invisible Hitbox for Easier Dragging */}
         <line
-         className="cursor-move"
+         className="cursor-move z-10 absolute"
           x1={cameraPosition.x-150}
           y1={cameraPosition.y}
           x2={lineEnd.x}
@@ -122,10 +141,11 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
       {/* Angle Display */}
       <div
         className="absolute text-white bg-gray-800 p-2 rounded"
-        style={{ left: `${cameraPosition.x + 50}px`, top: `${cameraPosition.y - 100}px` }}
+        style={{ left: `${cameraPosition.x - 300}px`, top: `${cameraPosition.y - 25}px` }}
       >
         Angle: {Math.round(angle)}°
       </div>
+      
     </>
   );
 };

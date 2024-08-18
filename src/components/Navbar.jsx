@@ -5,7 +5,6 @@ import ZoomControls from "./ZoomControls";
 export default function Navbar({handleReset, zoomIn, zoomOut,isDrawing, setIsDrawing }) {
 
 
-
     return(
         <div className=" w-full mt-2 z-50 ">
             <div className=" w-2/3 mx-auto  bg-gray-300 bg-opacity-25 rounded-xl p-1 border-2 border-gray-600">

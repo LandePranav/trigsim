@@ -15,7 +15,7 @@ import NotVisible from "../assets/NotVisible" ;
 const DraggableResizableShape = () => {
   const [cameramanPosition, setCameramanPosition] = useState({ x: 250, y: -100 });
   const [isDraggingCameraman, setIsDraggingCameraman] = useState(false);
-  const [targetPosition, setTargetPosition] = useState({ x: window.innerWidth - 300, y: -300 });
+  const [targetPosition, setTargetPosition] = useState({ x: window.innerWidth - 500, y: -275 });
   const [isDraggingTarget, setIsDraggingTarget] = useState(false);
   const [isDraggingAngle, setIsDraggingAngle] = useState(false);
   const [angle, setAngle] = useState(45);
@@ -37,7 +37,7 @@ const DraggableResizableShape = () => {
 
   useEffect(() => {
     setDistanceBetween(Math.round(targetPosition.x - cameramanPosition.x));
-    setHeightDiff(Math.round(targetPosition.y + 375));
+    setHeightDiff(Math.round(targetPosition.y + 390));
   }, [cameramanPosition, targetPosition]);
 
   const lineStart = {
@@ -57,7 +57,7 @@ const DraggableResizableShape = () => {
 
   const vlineEnd = {
     x: targetPosition.x ,
-    y: window.innerHeight - targetPosition.y - 600,
+    y: window.innerHeight - targetPosition.y - 600 +15,
   };
 
 
@@ -127,11 +127,13 @@ const DraggableResizableShape = () => {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Html fullscreen>
-          {angle}
           <Navbar isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
-          <CameraSvg className="w-44 absolute left-96 top-20" />
-          <div className="absolute w-full h-full top-44 left-96">
-            <div className="absolute w-36 h-16 -left-4 overflow-hidden">
+          <div className="absolute w-1/2 flex justify-end top-12"> 
+            <CameraSvg className="w-44 absolute -right-24" />
+          </div>
+          
+          <div className="absolute w-1/2 flex justify-end top-36">
+            <div className="absolute w-36 h-16 overflow-hidden -right-12">
  
             { (reqAngle <= angle) ? 
               <Visible
@@ -149,11 +151,11 @@ const DraggableResizableShape = () => {
             <Backcity className="object-cover w-full h-full opacity-65" />
           </div>
 
-          <div className="absolute z-30" style={{ left: `${(lineEnd.x + lineStart.x) / 2 - 10}px`, bottom: "45px" }}>
+          <div className="absolute z-30" style={{ left: `${(lineEnd.x + lineStart.x) / 2 - 10}px`, bottom: "60px" }}>
             <h2 className="bg-gray-700 text-white px-2 rounded-md">{distanceBetween/10}m</h2>
           </div>
 
-          <div className="absolute z-30" style={{ left: `${vlineEnd.x - 65}px`, top: `${(vlineEnd.y + vlineStart.y) / 2 + 70}px` }}>
+          <div className="absolute z-30" style={{ left: `${vlineEnd.x - 65}px`, top: `${(vlineEnd.y + vlineStart.y) / 2 + 70 - 15}px` }}>
             <h2 className="bg-gray-700 text-white px-2 rounded-md">{heightDiff/10}m</h2>
           </div>
 
