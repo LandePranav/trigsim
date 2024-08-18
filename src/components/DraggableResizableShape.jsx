@@ -1,5 +1,5 @@
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls, useTexture } from "@react-three/drei";
 import Backcity from "../assets/Backcity";
 import Cameraman from "../assets/Cameraman";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -28,6 +28,7 @@ const DraggableResizableShape = () => {
   const zoomOutRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [reqAngle, setReqAngle] = useState(10);
+  const canvasRef = useRef(null);
 
   useEffect(()=> {
     const angleInRad = Math.atan2(heightDiff,distanceBetween) ;
@@ -113,21 +114,33 @@ const DraggableResizableShape = () => {
     setIsDraggingAngle(false);
   };
 
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.style.width = `${window.innerWidth * zoomLevel}px`;
+    }
+  }, [zoomLevel]);
+  
+  //useEffect(()=>{window.alert("Try Moving Buildings and the angle")},[]);
+
   return (
     <div className="w-screen h-screen">
+
       <Canvas
+        ref={canvasRef}
         className="w-full h-full"
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerDown={handlePointerDown}
         camera={{ zoom: zoomLevel, position: [0, 0, 5] }}
       >
+      
         <ZoomControls setZoomLevel={setZoomLevel} zoomInRef={zoomInRef} zoomOutRef={zoomOutRef} />
         <OrbitControls />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Html fullscreen>
-          <Navbar isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+        <Navbar isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+
           <div className="absolute w-1/2 flex justify-end top-12"> 
             <CameraSvg className="w-44 absolute -right-24" />
           </div>
@@ -148,7 +161,8 @@ const DraggableResizableShape = () => {
 
           </div>
           <div className="absolute inset-0 w-full h-full -z-10">
-            <Backcity className="object-cover w-full h-full opacity-65" />
+          <Backcity className="object-cover w-full h-full opacity-65" /> 
+
           </div>
 
           <div className="absolute z-30" style={{ left: `${(lineEnd.x + lineStart.x) / 2 - 10}px`, bottom: "60px" }}>
