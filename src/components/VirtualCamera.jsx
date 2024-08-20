@@ -7,7 +7,7 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
   // Calculate the camera's central position based on the Cameraman's position
   const cameraPosition = {
     x: cameramanPosition.x + 200, // Your original x offset
-    y: window.innerHeight - 215, // Your original y offset
+    y: window.innerHeight - 150, // Your original y offset
   };
 
   // Calculate the endpoint of the line based on the angle

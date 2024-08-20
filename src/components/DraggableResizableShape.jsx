@@ -15,7 +15,7 @@ import NotVisible from "../assets/NotVisible" ;
 const DraggableResizableShape = () => {
   const [cameramanPosition, setCameramanPosition] = useState({ x: 250, y: -100 });
   const [isDraggingCameraman, setIsDraggingCameraman] = useState(false);
-  const [targetPosition, setTargetPosition] = useState({ x: window.innerWidth - 500, y: -275 });
+  const [targetPosition, setTargetPosition] = useState({ x: window.innerWidth - 500, y: -300 });
   const [isDraggingTarget, setIsDraggingTarget] = useState(false);
   const [isDraggingAngle, setIsDraggingAngle] = useState(false);
   const [angle, setAngle] = useState(45);
@@ -43,22 +43,22 @@ const DraggableResizableShape = () => {
 
   const lineStart = {
     x: cameramanPosition.x + 150 + 25,
-    y: window.innerHeight - 120,
+    y: window.innerHeight - 45,
   };
 
   const lineEnd = {
     x: targetPosition.x ,
-    y: window.innerHeight - 120,
+    y: window.innerHeight - 45,
   };
 
   const vlineStart = {
     x: targetPosition.x ,
-    y: window.innerHeight - 220,
+    y: window.innerHeight - 150,
   };
 
   const vlineEnd = {
     x: targetPosition.x ,
-    y: window.innerHeight - targetPosition.y - 600 +15,
+    y: window.innerHeight - targetPosition.y - 530 ,
   };
 
 
@@ -135,17 +135,24 @@ const DraggableResizableShape = () => {
       >
       
         <ZoomControls setZoomLevel={setZoomLevel} zoomInRef={zoomInRef} zoomOutRef={zoomOutRef} />
-        <OrbitControls />
+        <OrbitControls
+          onChange={(e) => {
+            if(e && e.target){
+              setZoomLevel(e.target.object.zoom) ;
+            }
+          }}
+        />
+
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Html fullscreen>
-        <Navbar isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+          <Navbar className="absolute z-50" isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+          <div className="w-screen h-screen  overflow-y-hidden -z-10" style={{transform:`scale(${zoomLevel})`}} >
+              <div className="absolute w-1/2 flex justify-end top-12"> 
+                <CameraSvg className="w-44 absolute -right-24" />
+              </div>
 
-          <div className="absolute w-1/2 flex justify-end top-12"> 
-            <CameraSvg className="w-44 absolute -right-24" />
-          </div>
-          
-          <div className="absolute w-1/2 flex justify-end top-36">
+              <div className="absolute w-1/2 flex justify-end top-36">
             <div className="absolute text-pretty w-60 -top-2 font-thin right-28 text-white bg-black bg-opacity-85 rounded-md p-2" >
                 {(reqAngle <= angle) ?
               <p>
@@ -173,8 +180,8 @@ const DraggableResizableShape = () => {
             </div>
 
           </div>
-          <div className="absolute inset-0 w-full h-full -z-10">
-          <Backcity ref={canvasRef} className="object-cover w-full h-full opacity-65" /> 
+          <div className="absolute inset-0 w-full h-full -z-10" >
+          <Backcity ref={canvasRef} className="object-cover w-full h-full opacity-65 -z-10" /> 
 
           </div>
 
@@ -182,7 +189,7 @@ const DraggableResizableShape = () => {
             <h2 className="bg-gray-700 text-white px-2 rounded-md">{distanceBetween/10}m</h2>
           </div>
 
-          <div className="absolute z-30" style={{ left: `${vlineEnd.x - 65}px`, top: `${(vlineEnd.y + vlineStart.y) / 2 + 70 - 15}px` }}>
+          <div className="absolute z-30" style={{ left: `${vlineEnd.x - 65}px`, top: `${(vlineEnd.y + vlineStart.y) / 2 - 15}px` }}>
             <h2 className="bg-gray-700 text-white px-2 rounded-md">{heightDiff/10}m</h2>
           </div>
 
@@ -210,7 +217,6 @@ const DraggableResizableShape = () => {
             <line x1={vlineStart.x} y1={vlineStart.y} x2={vlineEnd.x} y2={vlineEnd.y} stroke="red" strokeWidth="2" markerStart="url(#arrow-start)" markerEnd="url(#arrow-end)" />
           </svg>
 
-
           <div
             className="absolute cursor-move"
             style={{
@@ -224,8 +230,7 @@ const DraggableResizableShape = () => {
           >
             <Cameraman className="w-full h-full z-10" />
           </div>
-
-
+          
           <div
             className="absolute cursor-move"
             style={{
@@ -240,6 +245,9 @@ const DraggableResizableShape = () => {
             <Target className="w-full h-full z-10" />
           </div>
           <VirtualCamera cameramanPosition={cameramanPosition} onAngleChange={onAngleChange} handleClickImage={handleClickImage} />
+
+          </div>
+         
         </Html>
 
         {linesRef.current.map((line, index) => (
