@@ -30,6 +30,10 @@ const DraggableResizableShape = () => {
   const [reqAngle, setReqAngle] = useState(10);
   const canvasRef = useRef(null);
   const [maxWidth, setMaxWidth] = useState({ minX: 100, maxX: innerWidth - 200 });
+  const [isPanning, setIsPanning] = useState(false) ;
+  const [isPanningHard, setIsPanningHard] = useState(false) ;
+  const [panOffset, setPanOffset] = useState({x:0,y:0});
+  const [lastPanPosition,setLastPanPosition] = useState({x:0,y:0}) ;
 
   useEffect(() => {
     const angleInRad = Math.atan2(heightDiff, distanceBetween);
@@ -65,6 +69,9 @@ const DraggableResizableShape = () => {
   const handleReset = () => {
     setCameramanPosition({ x: 250, y: -100 });
     setTargetPosition({ x: window.innerWidth - 300, y: -300 });
+    setIsPanning(false) ;
+    setPanOffset({x:0, y:0}) ;
+    setLastPanPosition({x:0, y:0}) ;
   };
 
   const handleClickImage = () => {
@@ -87,10 +94,22 @@ const DraggableResizableShape = () => {
         currentLineRef.current.geometry.vertices.push(new THREE.Vector3(x, y, 0));
         currentLineRef.current.geometry.verticesNeedUpdate = true;
       }
+    } else if (isPanningHard){
+      const dx = e.clientX - lastPanPosition.x ;
+      const dy = e.clientY - lastPanPosition.y ;
+      setPanOffset((prev) => ({x:prev.x +dx, y: prev.y + dy})) ;
+      setLastPanPosition({x:e.clientX, y:e.clientY}) ;
     }
-  }, [isDraggingCameraman, isDraggingTarget, isDrawing]);
+  }, [isDraggingCameraman, isDraggingTarget, isDrawing, isPanningHard, lastPanPosition, maxWidth]);
 
   const handlePointerDown = (e) => {
+
+    if(isPanning){
+      setIsPanningHard(() => true) ;
+      setLastPanPosition({x:e.clientX, y:e.clientY}) ;
+      // canvasRef.current.style.cursor = "holding" ;
+    }
+
     if (isDrawing && e.point) {
       const { x, y } = e.point;
       const geometry = new THREE.BufferGeometry();
@@ -111,6 +130,7 @@ const DraggableResizableShape = () => {
     setIsDraggingTarget(false);
     currentLineRef.current = null;
     setIsDraggingAngle(false);
+    setIsPanningHard(false) ;
   };
 
   useEffect(() => {
@@ -123,8 +143,8 @@ const DraggableResizableShape = () => {
   }, [zoomLevel]);
 
   return (
-    <div className="w-screen h-screen relative">
-      <Navbar className="absolute z-50" isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
+    <div className={"w-screen h-screen relative"+(isPanning ? " cursor-grab":"") + (isPanningHard ? " cursor-grabbing " : "")}>
+      <Navbar className="absolute z-50" isPanning={isPanning} setIsPanning={setIsPanning} isDrawing={isDrawing} setIsDrawing={setIsDrawing} handleReset={handleReset} zoomIn={zoomInRef} zoomOut={zoomOutRef} />
 
       <Canvas
         ref={canvasRef}
@@ -146,7 +166,7 @@ const DraggableResizableShape = () => {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <Html fullscreen>
-          <div className="w-screen h-screen overflow-y-hidden -z-10" style={{ transform: `scale(${zoomLevel})` }}>
+          <div className="w-screen h-screen overflow-y-hidden -z-10" style={{ transform: `scale(${zoomLevel}) translate(${panOffset.x}px, ${panOffset.y}px)` }}>
             <div className="absolute w-1/2 flex justify-end top-12">
               <CameraSvg className="w-44 absolute -right-24" />
             </div>
@@ -178,7 +198,7 @@ const DraggableResizableShape = () => {
               </div>
             </div>
             <div className="absolute inset-0 w-full h-full -z-10">
-              <Backcity ref={canvasRef} className="object-cover w-full h-full opacity-65 -z-10" />
+              <Backcity className="object-cover w-full h-full opacity-65 -z-10" />
             </div>
 
             <div className="absolute z-30" style={{ left: `${(lineEnd.x + lineStart.x) / 2 - 10}px`, bottom: "60px" }}>

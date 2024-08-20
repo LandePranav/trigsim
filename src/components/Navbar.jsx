@@ -3,7 +3,7 @@ import { useThree } from "@react-three/fiber";
 import ZoomControls from "./ZoomControls";
 import { MantineProvider, Tooltip, Button } from "@mantine/core";
 
-export default function Navbar({ handleReset, zoomIn, zoomOut, isDrawing, setIsDrawing }) {
+export default function Navbar({ handleReset, zoomIn, zoomOut, isDrawing, setIsDrawing, isPanning, setIsPanning }) {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS withCssVariables withGlobalClasses >
@@ -34,11 +34,14 @@ export default function Navbar({ handleReset, zoomIn, zoomOut, isDrawing, setIsD
               </button>
             </Tooltip>
 
-            <button type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
-              </svg>
-            </button>
+            <Tooltip label="Panning" className="absolute text-white bg-black bg-opacity-75 px-1.5 rounded-md" offset={15}  >
+               <button onClick={() => setIsPanning(()=> !isPanning)} type="button" className={"border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black "+(isPanning ? "bg-blue-400  border-black hover:bg-blue-200": "")} >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+                    </svg>
+                </button> 
+            </Tooltip>
+            
 
             <button onClick={() => setIsDrawing(!isDrawing)} type="button" className="border-2 w-full border-transparent mx-3 my-1 flex justify-center items-center  py-1 rounded-2xl hover:bg-gray-200 hover:border-2 hover:border-black">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
