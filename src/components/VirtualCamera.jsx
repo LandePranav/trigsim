@@ -21,8 +21,8 @@ const VirtualCamera = ({ cameramanPosition, onAngleChange, handleClickImage }) =
   const handleMouseMove = (e) => {
     if (dragging) {
       // Calculate the new angle based on mouse position relative to the camera position
-      const dx = e.clientX - cameraPosition.x + 75 ;
-      const dy = cameraPosition.y - e.clientY + 75; // Inverted y-axis for screen coordinates
+      const dx = e.clientX - cameraPosition.x + 150 ;
+      const dy = cameraPosition.y - e.clientY ; // Inverted y-axis for screen coordinates
       const newAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
       // Restrict the angle to between 0 and 180 degrees
