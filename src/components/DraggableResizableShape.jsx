@@ -146,6 +146,19 @@ const DraggableResizableShape = () => {
           </div>
           
           <div className="absolute w-1/2 flex justify-end top-36">
+            <div className="absolute text-pretty w-60 -top-2 font-thin right-28 text-white bg-black bg-opacity-85 rounded-md p-2" >
+                {(reqAngle <= angle) ?
+              <p>
+                The target person is visible .
+                current angle of inclination is more than required !
+              </p> 
+              :
+              <p>
+                Target person is not visible yet .
+                Try to increase angle of inclination !
+              </p> }
+            </div>
+
             <div className="absolute w-36 h-16 overflow-hidden -right-12">
  
             { (reqAngle <= angle) ? 
@@ -161,7 +174,7 @@ const DraggableResizableShape = () => {
 
           </div>
           <div className="absolute inset-0 w-full h-full -z-10">
-          <Backcity className="object-cover w-full h-full opacity-65" /> 
+          <Backcity ref={canvasRef} className="object-cover w-full h-full opacity-65" /> 
 
           </div>
 
