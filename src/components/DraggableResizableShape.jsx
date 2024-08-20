@@ -29,6 +29,7 @@ const DraggableResizableShape = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [reqAngle, setReqAngle] = useState(10);
   const canvasRef = useRef(null);
+  const [maxWidth, setMaxWidth] = useState({minX:100,maxX:innerWidth-200}) ;
 
   useEffect(()=> {
     const angleInRad = Math.atan2(heightDiff,distanceBetween) ;
@@ -74,11 +75,11 @@ const DraggableResizableShape = () => {
   const handlePointerMove = useCallback((e) => {
     if (isDraggingCameraman) {
       setCameramanPosition((prev) => ({
-        x: e.clientX - 50,
+        x: Math.max(maxWidth.minX, Math.min(maxWidth.maxX, e.clientX - 50)),
       }));
     } else if (isDraggingTarget) {
       setTargetPosition((prev) => ({
-        x: e.clientX - 50,
+        x: Math.max(maxWidth.minX, Math.min(maxWidth.maxX, e.clientX - 50)),
         y: Math.max(-350, Math.min(0, prev.y - (e.movementY))),
       }));
     } else if (isDrawing && e.point) {
@@ -87,7 +88,6 @@ const DraggableResizableShape = () => {
         currentLineRef.current.geometry.vertices.push(new THREE.Vector3(x, y, 0));
         currentLineRef.current.geometry.verticesNeedUpdate = true;
       }
-    
     }
   }, [isDraggingCameraman, isDraggingTarget, isDrawing]);
 
@@ -118,6 +118,9 @@ const DraggableResizableShape = () => {
     if (canvasRef.current) {
       canvasRef.current.style.width = `${window.innerWidth * zoomLevel}px`;
     }
+
+    setMaxWidth({minX:100,maxX:innerWidth-200}) ;
+
   }, [zoomLevel]);
   
   //useEffect(()=>{window.alert("Try Moving Buildings and the angle")},[]);
